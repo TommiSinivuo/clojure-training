@@ -152,6 +152,12 @@ true false      ; booleans
 
 (prn "evaluates third" (prn "evaluates first") (prn "evaluates second"))
 
+(def four 4)
+(def six 6)
+
+(+ four six)
+
+
 
 
 
@@ -166,6 +172,7 @@ true false      ; booleans
 (defn greet  [name]  (str "Hello, " name))
 
 (greet "Tommi")
+
 
 
 
@@ -223,16 +230,30 @@ true false      ; booleans
 #(println %1 %2 %&)
 
 
+;; Example:
+
+(map (fn [x] (* 2 x)) [1 2 3])
+; vs
+(map #(* 2 %) [1 2 3])
+
+
+
+
 ;;------------------------------------------------------------------------------------------
 ;; Applying Functions
 ;;------------------------------------------------------------------------------------------
 
 (def f #(str %1 %2 %3 %4))
+(def values '(3 2 1 0))
+
+(apply f values)
 
 (apply f '(1 2 3 4))    ;; same as  (f 1 2 3 4)
 (apply f 1 '(2 3 4))    ;; same as  (f 1 2 3 4)
 (apply f 1 2 '(3 4))    ;; same as  (f 1 2 3 4)
 (apply f 1 2 3 '(4))    ;; same as  (f 1 2 3 4)
+
+
 
 
 
@@ -251,7 +272,7 @@ true false      ; booleans
 ;; A lexical scope creates a new context for names, nested inside the surrounding context.
 ;; Names defined in a let take precedence over the names in the outer context.
 
-;;       bindings      name is defined here
+;;       bindings      name is available here
 ;;       ------------  ----------------------
 ;; (let  [name value]  (code that uses name))
 
@@ -274,9 +295,11 @@ true false      ; booleans
 
 ;; greeting provided here, then goes out of scope
 (def hello-er (messenger-builder "Hello"))
+(def moikka-er (messenger-builder "Moikka"))
 
 ;; greeting value still available because hello-er is a closure
-(hello-er "world!")
+(hello-er "Tommi")
+(moikka-er "Tommi")
 
 
 
@@ -289,7 +312,7 @@ true false      ; booleans
 
 
 ;; Task              | Java                  | Clojure
-------------------------------------------------------------------
+;; ------------------------------------------------------------------
 ;; Instantiation     | new Widget("foo")     | (Widget. "foo") 
 ;; Instance method   | rnd.nextInt()         | (.nextInt rnd)
 ;; Instance field    | object.field          | (.-field object)
@@ -299,10 +322,10 @@ true false      ; booleans
 
 ;; Try in REPL:
 
-(def str-builder (java.lang.StringBuilder.))
-(.append str-builder "Hello")
-(.append str-builder " world!")
-(def the-string (.toString str-builder))
+(def sb (java.lang.StringBuilder.))
+(.append sb "Hello")
+(.append sb " world!")
+(def the-string (.toString sb))
 the-string
 
 ;;------------------------------------------;;
@@ -348,7 +371,7 @@ the-string
 (count [1 2 3])
 
 ;; Constructing using vector
-(vector [1 2 3])
+(vector 1 2 3)
 
 ;; From a list
 (apply vector '(1 2 3)) ;; -> (vector 1 2 3) -> [1 2 3]
@@ -466,12 +489,14 @@ the-string
                  :south 2
                  :west 3})
 
+(get directions :south)
 (directions :south)
 (:south directions)
 
 
 (def bad-lookup-map nil)
-(:foo bad-lookup-map) ;; exception
+(bad-lookup-map :foo) ;; exception
+(:foo bad-lookup-map) ;; nil
 (get bad-lookup-map :foo) ;; nil
 
 
@@ -588,14 +613,20 @@ the-string
 (if nil :truthy :falsey)
 
 
+
+
 ;;------------------------------------------------------------------------------------------
 ;; if and do
 ;;------------------------------------------------------------------------------------------
+
+
 (if (even? 5)
   (do (println "even")
       true)
   (do (println "odd")
       false))
+
+
 
 
 ;;------------------------------------------------------------------------------------------
@@ -605,6 +636,8 @@ the-string
 (when (even? 6)
   (println "even")
   true)
+
+
 
 
 ;;------------------------------------------------------------------------------------------
@@ -617,6 +650,8 @@ the-string
     (< x 10) "x is less than 10"))
 
 
+
+
 ;;------------------------------------------------------------------------------------------
 ;; cond and else
 ;;------------------------------------------------------------------------------------------
@@ -626,6 +661,8 @@ the-string
     (< x 2)  "x is less than 2"
     (< x 10) "x is less than 10"
     :else  "x is greater than or equal to 10"))
+
+
 
 
 ;;------------------------------------------------------------------------------------------
@@ -641,6 +678,8 @@ the-string
 (foo 11) ;; throws IllegalArgumentException!
 
 
+
+
 ;;------------------------------------------------------------------------------------------
 ;; case with else-expression
 ;;------------------------------------------------------------------------------------------
@@ -652,6 +691,7 @@ the-string
            "x isn't 5 or 10"))
 
 (foo 11)
+
 
 
 
@@ -673,6 +713,8 @@ the-string
   (println i))
 
 
+
+
 ;;------------------------------------------------------------------------------------------
 ;; doseq
 ;;------------------------------------------------------------------------------------------
@@ -680,6 +722,8 @@ the-string
 ;; Iterates over a sequence. If the sequence is lazy, it forces evaluation. Returns nil.
 (doseq [n (range 3)]
   (println n))
+
+
 
 
 ;;------------------------------------------------------------------------------------------
@@ -691,6 +735,8 @@ the-string
 (doseq [letter [:a :b]
         number (range 3)]
   (prn [letter number]))
+
+
 
 
 ;;==========================================================================================
@@ -730,6 +776,8 @@ the-string
     i))
 
 
+
+
 ;;------------------------------------------------------------------------------------------
 ;; defn and recur
 ;;------------------------------------------------------------------------------------------
@@ -740,6 +788,9 @@ the-string
     i))
 
 (increase 0)
+
+
+
 
 ;;------------------------------------------------------------------------------------------
 ;; recur for recursion
@@ -755,9 +806,11 @@ the-string
 (defn bad-rabbit-ears [n-rabbits]
   (if (= n-rabbits 0)
     0
-    (+ 2 (rabbit-ears (dec n-rabbits)))))
+    (+ 2 (bad-rabbit-ears (dec n-rabbits)))))
 
 (bad-rabbit-ears 1111)
+
+
 
 
 ;; A correct way to count rabbit ears recursively uses and accumulator, which holds the
@@ -818,7 +871,7 @@ the-string
 (try
   (throw (ex-info "There was a problem" {:detail 42}))
   (catch Exception e
-    (prn (:detail (ex-data e)))))
+    (:detail (ex-data e))))
 
 
 ;;------------------------------------------------------------------------------------------
