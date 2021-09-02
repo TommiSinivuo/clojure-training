@@ -1,4 +1,4 @@
-(ns clojure-training.training-2
+(ns clojure-training.training-03
   (:require [clojure.string :refer [capitalize join]]))
 
 
